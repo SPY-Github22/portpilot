@@ -7,6 +7,7 @@ import { PortReference } from './components/PortReference';
 import { KillModal } from './components/KillModal';
 import { ListeningPort } from './core/types';
 import { analyzePortConflicts } from './core/portRegistry';
+import { generateDiagnosticMarkdown } from './core/commands';
 
 // High-realism simulated ports for offline / demo mode
 const DEFAULT_MOCK_PORTS: ListeningPort[] = [
@@ -155,6 +156,12 @@ export function App() {
     }
   };
 
+  const handleExportReport = () => {
+    const report = generateDiagnosticMarkdown(ports, conflicts);
+    navigator.clipboard.writeText(report);
+    showToast(`✓ Copied full markdown diagnostic report to clipboard!`);
+  };
+
   return (
     <div className="min-h-screen bg-neutral-950 flex flex-col">
       <Header
@@ -162,6 +169,7 @@ export function App() {
         onSelectMode={setMode}
         isLiveConnected={isLiveConnected}
         onRefresh={fetchLivePorts}
+        onExportReport={handleExportReport}
         activePortCount={ports.length}
         conflictCount={conflicts.length}
         ghostCount={ghostCount}

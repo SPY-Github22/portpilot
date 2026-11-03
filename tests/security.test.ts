@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { validatePid, isProtectedProcess, generateKillCommands, SessionTokenGuard, SecurityGuardError } from '../server/security';
+import { generateDockerCommands, generateDiagnosticMarkdown } from '../src/core/commands';
 
 describe('Process Security Guard', () => {
   it('should validate valid user-space PIDs', () => {
@@ -27,6 +28,35 @@ describe('Process Security Guard', () => {
     expect(cmds.linux).toContain('kill -9 12345');
     expect(cmds.macos).toContain('12345');
     expect(cmds.windows).toContain('taskkill /PID 12345 /F');
+  });
+
+  it('should generate Docker commands for port mapping', () => {
+    const cmds = generateDockerCommands(5432);
+    expect(cmds.findContainer).toBe('docker ps --filter "publish=5432"');
+    expect(cmds.stopContainer).toContain('docker stop');
+    expect(cmds.stopContainer).toContain('5432');
+  });
+
+  it('should generate Markdown diagnostic reports', () => {
+    const report = generateDiagnosticMarkdown(
+      [
+        {
+          port: 3000,
+          protocol: 'TCP',
+          address: '127.0.0.1',
+          pid: 8844,
+          processName: 'node',
+          serviceTag: 'Next.js',
+          isGhost: false,
+        },
+      ],
+      [{ port: 3000, reason: 'Duplicate workers' }]
+    );
+
+    expect(report).toContain('### 🔌 PortPilot Diagnostic Report');
+    expect(report).toContain('⚠️ Active Conflicts');
+    expect(report).toContain('Port 3000');
+    expect(report).toContain('| 3000 | TCP | `127.0.0.1` | `8844` | node | Next.js | 🟢 Active |');
   });
 
   it('should generate and verify random CSRF session tokens', () => {

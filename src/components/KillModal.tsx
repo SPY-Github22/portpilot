@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Skull, Copy, Check, Terminal, ShieldAlert } from 'lucide-react';
+import { X, Skull, Copy, Check, Terminal, ShieldAlert, Box } from 'lucide-react';
 import { ListeningPort } from '../core/types';
-import { generateKillCommands } from '../core/commands';
+import { generateKillCommands, generateDockerCommands } from '../core/commands';
 
 interface KillModalProps {
   isOpen: boolean;
@@ -22,6 +22,8 @@ export const KillModal: React.FC<KillModalProps> = ({
 
   const validPid = targetPort.pid > 1 ? targetPort.pid : 99999;
   const commands = generateKillCommands(validPid, targetPort.port);
+  const isDocker = targetPort.processName.toLowerCase().includes('docker');
+  const dockerCommands = isDocker ? generateDockerCommands(targetPort.port) : null;
 
   const handleCopy = (key: string, cmd: string) => {
     navigator.clipboard.writeText(cmd);
@@ -80,6 +82,26 @@ export const KillModal: React.FC<KillModalProps> = ({
               </div>
             )}
           </div>
+
+          {/* Docker specific container stop commands */}
+          {dockerCommands && (
+            <div className="space-y-1.5 bg-blue-950/20 border border-blue-900/40 p-3 rounded-lg">
+              <span className="font-semibold text-blue-400 text-[11px] flex items-center gap-1.5">
+                <Box className="w-3.5 h-3.5" />
+                <span>Docker Container Detected:</span>
+              </span>
+              <div className="bg-neutral-950 border border-neutral-800 rounded p-2 flex items-center justify-between font-mono text-[11px]">
+                <code className="text-blue-300 truncate flex-1">{dockerCommands.stopContainer}</code>
+                <button
+                  onClick={() => handleCopy('docker', dockerCommands.stopContainer)}
+                  className="p-1 text-neutral-400 hover:text-white transition"
+                  title="Copy docker stop command"
+                >
+                  {copiedCmd === 'docker' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Fallback Shell Command */}
           <div className="space-y-1.5">

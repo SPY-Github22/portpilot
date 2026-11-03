@@ -1,11 +1,12 @@
 import React from 'react';
-import { Radio, RefreshCw, AlertTriangle, ShieldCheck, Terminal, BookOpen, Layers } from 'lucide-react';
+import { Radio, RefreshCw, AlertTriangle, ShieldCheck, Terminal, BookOpen, Layers, FileDown } from 'lucide-react';
 
 interface HeaderProps {
   mode: 'live' | 'paste' | 'registry';
   onSelectMode: (mode: 'live' | 'paste' | 'registry') => void;
   isLiveConnected: boolean;
   onRefresh: () => void;
+  onExportReport: () => void;
   activePortCount: number;
   conflictCount: number;
   ghostCount: number;
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectMode,
   isLiveConnected,
   onRefresh,
+  onExportReport,
   activePortCount,
   conflictCount,
   ghostCount,
@@ -101,6 +103,15 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Port Catalog</span>
             </button>
           </div>
+
+          <button
+            onClick={onExportReport}
+            className="flex items-center gap-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-md border border-neutral-700 font-medium transition"
+            title="Export full diagnostic report as Markdown"
+          >
+            <FileDown className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Export Report</span>
+          </button>
 
           {mode === 'live' && (
             <button

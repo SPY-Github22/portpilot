@@ -45,3 +45,48 @@ export function generateKillCommands(pid: number, port?: number): {
     windows: `taskkill /PID ${validPid} /F`,
   };
 }
+
+/**
+ * Generate Docker container discovery and stop commands for a given port
+ */
+export function generateDockerCommands(port: number): {
+  findContainer: string;
+  stopContainer: string;
+} {
+  return {
+    findContainer: `docker ps --filter "publish=${port}"`,
+    stopContainer: `docker stop $(docker ps -q --filter "publish=${port}")`,
+  };
+}
+
+/**
+ * Generate Markdown Diagnostic Report for team sharing
+ */
+export function generateDiagnosticMarkdown(
+  ports: { port: number; protocol: string; address: string; pid: number | null; processName: string; serviceTag?: string; isGhost?: boolean }[],
+  conflicts: { port: number; reason: string }[] = []
+): string {
+  const lines: string[] = [];
+  lines.push('### 🔌 PortPilot Diagnostic Report');
+  lines.push(`Generated: ${new Date().toISOString()}`);
+  lines.push(`Total Listening Ports: ${ports.length}`);
+  lines.push(`Detected Conflicts: ${conflicts.length}\n`);
+
+  if (conflicts.length > 0) {
+    lines.push('#### ⚠️ Active Conflicts');
+    for (const c of conflicts) {
+      lines.push(`- **Port ${c.port}**: ${c.reason}`);
+    }
+    lines.push('');
+  }
+
+  lines.push('| Port | Protocol | Address | PID | Process | Service | Status |');
+  lines.push('| :--- | :---: | :--- | :--- | :--- | :--- | :--- |');
+
+  for (const p of ports) {
+    const status = p.isGhost ? '👻 Ghost' : '🟢 Active';
+    lines.push(`| ${p.port} | ${p.protocol} | \`${p.address}\` | \`${p.pid ?? 'N/A'}\` | ${p.processName} | ${p.serviceTag || '-'} | ${status} |`);
+  }
+
+  return lines.join('\n');
+}
