@@ -1,7 +1,13 @@
 # PortPilot 🔌✈️
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-indigo?style=for-the-badge&logo=github)](https://spy-github22.github.io/portpilot/)
+[![CI & Deployment](https://github.com/SPY-Github22/portpilot/actions/workflows/ci.yml/badge.svg)](https://github.com/SPY-Github22/portpilot/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 > **The Local Port & Ghost Process Exorcist**  
 > *Inspect listening dev ports, exorcise zombie background processes, prevent port collisions, and generate instant cross-platform kill commands.*
+
+🌐 **Live Web App**: [https://spy-github22.github.io/portpilot/](https://spy-github22.github.io/portpilot/)
 
 ---
 
